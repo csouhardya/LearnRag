@@ -9,6 +9,9 @@ using OpenAI.Chat;
 
 namespace LearnRag.Services
 {
+    /// <summary>
+    /// Retrieves relevant document chunks from Azure AI Search and uses Azure OpenAI to answer questions from them.
+    /// </summary>
     public class AskService: IAskService
     {
         private readonly AzureOpenAIClient _azOpenAiClient; // to communicate with azure openai
@@ -24,6 +27,13 @@ namespace LearnRag.Services
         private readonly string searchServiceApiKey;
         private readonly string indexName;
 
+        /// <summary>
+        /// Initializes the question-answering service and creates its Azure AI Search client.
+        /// </summary>
+        /// <param name="azOpenAiClient">Client used to create embeddings and chat completions.</param>
+        /// <param name="config">Application configuration containing Azure OpenAI and Search settings.</param>
+        /// <param name="embeddingService">Service used to embed the user's question.</param>
+        /// <param name="logger">Logger used to record question-answering progress.</param>
         public AskService(
             AzureOpenAIClient azOpenAiClient,
             IConfiguration config,
@@ -44,6 +54,11 @@ namespace LearnRag.Services
             searchClient = new SearchClient(new Uri(searchServiceEndpoint), indexName, creds);
         }
 
+        /// <summary>
+        /// Embeds a question, retrieves the closest indexed chunks, and asks the chat model to answer using that context.
+        /// </summary>
+        /// <param name="question">Question to answer using the indexed document content.</param>
+        /// <returns>The generated answer and available chat completion metadata.</returns>
         public async Task<AskResponse> AskAsync(string question)
         {
             List<string> chunks = [];

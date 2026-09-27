@@ -4,12 +4,21 @@ using LearnRag.Interfaces;
 
 namespace LearnRag.Services
 {
+    /// <summary>
+    /// Uses Azure OpenAI to generate vector embeddings for document chunks and user queries.
+    /// </summary>
     public class EmbeddingService(AzureOpenAIClient azOpenAiClient, IConfiguration config, ILogger<EmbeddingService> logger): IEmbeddingService
     {
         private readonly AzureOpenAIClient _azOpenAiClient = azOpenAiClient;
         private readonly string embeddingDeployment = config["AzureAiSearch:DeploymentName"]!;
         private readonly ILogger<EmbeddingService> _logger = logger;
 
+        /// <summary>
+        /// Generates an embedding for each chunk and creates search documents containing the text and its vector.
+        /// </summary>
+        /// <param name="docName">Name used to identify the source document in the search index.</param>
+        /// <param name="chunks">Text chunks to embed.</param>
+        /// <returns>Search documents ready to upload to Azure AI Search.</returns>
         public async Task<List<SearchDocument>> EmbedAsync(string docName, List<string> chunks)
         {
             docName = docName.Split('.')[0];
@@ -39,6 +48,11 @@ namespace LearnRag.Services
             return doc;
         }
 
+        /// <summary>
+        /// Generates an embedding vector for a user query.
+        /// </summary>
+        /// <param name="query">Text of the query to embed.</param>
+        /// <returns>The query embedding as an array of single-precision floating-point values.</returns>
         public async Task<float[]> EmbedAsync(string query)
         {
             _logger.LogInformation($"Starting embedding of query: -> {query}");

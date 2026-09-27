@@ -7,6 +7,9 @@ using LearnRag.Interfaces;
 
 namespace LearnRag.Services
 {
+    /// <summary>
+    /// Extracts documents, creates embeddings for their text chunks, and stores those chunks in Azure AI Search.
+    /// </summary>
     public class IngestionService: IIngestionService
     {
         private readonly SearchClient searchClient; // to communicate with azure ai search, uploading document, search for relevant chunk
@@ -22,6 +25,13 @@ namespace LearnRag.Services
         private readonly string vectorAlgorithmConfigName;
         private readonly string vectorProfileName;
 
+        /// <summary>
+        /// Initializes the ingestion service and creates Azure AI Search clients from the configured settings.
+        /// </summary>
+        /// <param name="config">Application configuration containing Azure AI Search connection and index settings.</param>
+        /// <param name="embeddingService">Service used to create embeddings for document chunks.</param>
+        /// <param name="pdfService">Service used to extract and chunk PDF content.</param>
+        /// <param name="logger">Logger used to record ingestion progress.</param>
         public IngestionService(
             IConfiguration config,
             IEmbeddingService embeddingService,
@@ -46,6 +56,11 @@ namespace LearnRag.Services
             searchIndexClient = new(new Uri(searchServiceEndpoint), creds);
         }
 
+        /// <summary>
+        /// Extracts a document, splits its content into chunks, generates embeddings, and uploads the chunks to the search index.
+        /// </summary>
+        /// <param name="docName">Name of the uploaded document to ingest.</param>
+        /// <returns>The number of text chunks uploaded.</returns>
         public async Task<int> IngestDocumentAsync(string docName)
         {
             _logger.LogInformation($"Ingesting document {docName}");
@@ -69,6 +84,10 @@ namespace LearnRag.Services
             return chunks.Count;
         }
 
+        /// <summary>
+        /// Creates or updates the configured Azure AI Search index and its vector-search configuration.
+        /// </summary>
+        /// <returns>A task representing the asynchronous index operation.</returns>
         private async Task EnsureIndexExistsAsync()
         {
             _logger.LogInformation($"Trying to create index if not exist");

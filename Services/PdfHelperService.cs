@@ -5,10 +5,18 @@ using UglyToad.PdfPig.DocumentLayoutAnalysis.TextExtractor;
 
 namespace LearnRag.Services
 {
+    /// <summary>
+    /// Extracts text from PDF files in the configured upload folder and splits text into paragraphs.
+    /// </summary>
     public class PdfHelperService(IConfiguration config, ILogger<PdfHelperService> logger): IPdfHelperService
     {
         private readonly string uploadFolder = config["Constants:UploadFolderPath"]!;
         private readonly ILogger<PdfHelperService> _logger = logger;
+        /// <summary>
+        /// Splits extracted text at double CRLF separators and returns the resulting paragraphs as chunks.
+        /// </summary>
+        /// <param name="content">Text to split into chunks.</param>
+        /// <returns>A list containing each paragraph produced by the split.</returns>
         public List<string> ChunkText(string content)
         {
             string separator = "\r\n\r\n";
@@ -19,6 +27,11 @@ namespace LearnRag.Services
             return chunks;
         }
 
+        /// <summary>
+        /// Reads each page of the named PDF and concatenates its extracted text with page separators.
+        /// </summary>
+        /// <param name="docName">Name of the PDF file within the configured upload folder.</param>
+        /// <returns>The extracted text from all pages of the PDF.</returns>
         public async Task<string> ExtractContentAsync(string docName)
         {
             StringBuilder sb = new();
