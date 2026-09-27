@@ -1,0 +1,6 @@
+@LearnRag_HostAddress = http://localhost:5082
+
+GET {{LearnRag_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
